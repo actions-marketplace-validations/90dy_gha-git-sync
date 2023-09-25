@@ -16,15 +16,18 @@ runs:
       ref: main
 
   - name: Include .gitconfig to .git/config
+    shell: bash
     run: |
       [ ! -d '.git' ] || git config --local include.path $PWD/.gitconfig
 
   - name: Set committer infos
+    shell: bash
     run: |
       git config --global user.email "90dy+bot@proton.me"
       git config --global user.name "Just a bot after all"
 
   - name: Pull template
+    shell: bash
     run: |
       git fetch template/${{ matrix.template }} || true
       git merge --squash --allow-unrelated-histories template/${{ matrix.template }} -X theirs || true
@@ -35,6 +38,7 @@ runs:
   #       || git reset -- .github/workflows && git commit --amend --no-edit --no-verify
 
   - name: Push on repository
+    shell: bash
     run: |
       git push -u origin template/${{ matrix.template }}
 
