@@ -4,6 +4,15 @@ inputs:
   template:  # id of input
     description: 'Template to pull from'
     required: true
+  user-email:
+    description: 'Git config user email'
+    required: true
+    default: '90dy+bot@proton.me'
+  user-name:
+    description: 'Git config user name'
+    required: true
+    default: 'Just a bot after all'
+
 # outputs:
   # random-number:
     # description: "Random number"
@@ -23,8 +32,8 @@ runs:
   - name: Set committer infos
     shell: bash
     run: |
-      git config --global user.email "90dy+bot@proton.me"
-      git config --global user.name "Just a bot after all"
+      git config --global user.email "${{ inputs.user-email }}"
+      git config --global user.name "${{ inputs.user-name }}"
 
   - name: Pull template
     shell: bash
