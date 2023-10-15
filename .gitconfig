@@ -1,0 +1,4 @@
+[remote "90dy/gha-git-sync"]
+	url = "https://github.com/90dy/gha-git-sync"
+	fetch = "+refs/heads/main:refs/remotes/90dy/gha-git-sync/main"
+	tagOpt = --no-tags

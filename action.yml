@@ -1,58 +1,77 @@
-name: 'Pull templates repositories'
-description: 'Permit to sync updates from template repositories'
+name: Git sync from 90dy
+description: Permit to sync last changes from another repository
 inputs:
-  template:  # id of input
-    description: 'Template to pull from'
+  repository:
+    description: Repository to pull from
+    required: true
+  branch:
+    description: Branch to sync
     required: true
   user-email:
-    description: 'Git config user email'
+    description: Git user email
     required: true
-    default: '90dy+bot@proton.me'
   user-name:
-    description: 'Git config user name'
+    description: Git user name
     required: true
-    default: 'Just a bot after all'
+  paths:
+    description: File path to sync (not directories)
+  commit-message:
+    description: Commit message
+  assignees:
+    description: A comma or newline-separated list of assignees (GitHub usernames).
 
-# outputs:
-  # random-number:
-    # description: "Random number"
-    # value: ${{ steps.random-number-generator.outputs.random-number }}
 runs:
-  using: "composite"
+  using: composite
   steps:
-  - uses: actions/checkout@v2
-    with:
-      ref: main
-
-  - name: Include .gitconfig to .git/config
-    shell: bash
+  - shell: bash
     run: |
-      [ ! -d '.git' ] || git config --local include.path $PWD/.gitconfig
-
-  - name: Set committer infos
-    shell: bash
-    run: |
+      # Set commiter infos
       git config --global user.email "${{ inputs.user-email }}"
       git config --global user.name "${{ inputs.user-name }}"
 
-  - name: Pull template
-    shell: bash
+  - shell: bash
     run: |
-      git fetch template/${{ matrix.template }} || true
-      git merge --squash --allow-unrelated-histories template/${{ matrix.template }} -X theirs || true
+      # Fetch repository
+      git fetch ${{ inputs.repository }} ${{ inputs.branch }}
 
-  # - name: Revert commit update on .github/workflows if WORKFLOW_TOKEN doesn't exists
-  #   run: |
-  #     [ -z "${{ secrets.WORKFLOW_TOKEN }}" ] \
-  #       || git reset -- .github/workflows && git commit --amend --no-edit --no-verify
-
-  - name: Push on repository
-    shell: bash
+  - shell: bash
     run: |
-      git push -u origin template/${{ matrix.template }}
+      # Checkout new branch to ${{ inputs.repository }}/${{ inputs.branch }}
+      git checkout -b ${{ inputs.repository }}/${{ inputs.branch }}
 
-  - name: Create pull request
+  - shell: bash
+    id: rebase
+    run: |
+      # Try to rebase and push on ${{ github.ref_name }}
+      git rebase ${{ github.ref_name }} -- $([ -z "${{ inputs.paths }}" ] || echo "${{ inputs.paths }}" | xargs echo)
+
+  - shell: bash
+    id: merge
+    if: success() && steps.rebase.conclusion == 'success'
+    run: |
+      # Then merge to ${{ github.ref_name }}
+      git checkout ${{ github.ref_name }}
+      git merge ${{ inputs.repository }}/${{ inputs.branch }}
+
+  - shell: bash
+    id: push
+    if: success() && steps.merge.conclusion == 'success'
+    run: |
+      # Then push to ${{ github.ref_name }} if necessary
+      git push -u origin ${{ github.ref_name }}
+
+  - shell: bash
+    id: abort
+    if: failure() && steps.rebase.conclusion == 'failure'
+    run: |
+      # Else abort
+      git rebase --abort
+
+  - if: success() && steps.abort.conclusion == 'success'
     uses: peter-evans/create-pull-request@v5
     with:
-      title: Auto upgrade from template
-      branch: template/${{ matrix.template }}
+      token: ${{ env.GITHUB_TOKEN }}
+      title: Sync from ${{ inputs.repository }}/${{ inputs.branch }}
+      branch:  ${{ inputs.repository }}/${{ inputs.branch }}
+      author: ${{ inputs.user-name }} <${{ inputs.user-email }}>
+      committer: ${{ inputs.user-name }} <${{ inputs.user-email }}>
