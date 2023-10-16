@@ -14,7 +14,7 @@ inputs:
     description: Git user name
     required: true
   paths:
-    description: File path to sync (not directories)
+    description: File paths to sync (not directories)
   commit-message:
     description: Commit message
   assignees:
@@ -25,7 +25,7 @@ runs:
   steps:
   - shell: bash
     run: |
-      # Set commiter infos
+      # Set commiter author
       git config --global user.email "${{ inputs.user-email }}"
       git config --global user.name "${{ inputs.user-name }}"
 

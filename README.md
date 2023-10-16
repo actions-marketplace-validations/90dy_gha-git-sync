@@ -32,18 +32,19 @@ jobs:
           branch: '' # Branch to sync
           user-email: '' # Git user email
           user-name: '' # Git user name
-          paths: '' # File path to sync (not directories)
+          paths: | # File path to sync (not directories)
+            file-a.txt
+            file-b.txt
           commit-message: '' # Commit message
           assignees: '' # A comma or newline-separated list of assignees (GitHub usernames)
-
 ```
 
 You can configure the following inputs based on your requirements:
 
-- `repository`: The repository to pull changes from.
-- `branch`: The branch to sync.
-- `user-email`: Your Git user email.
-- `user-name`: Your Git user name.
+- `repository`: The repository to pull changes from. (required)
+- `branch`: The branch to sync. (required)
+- `user-email`: Your Git user email. (required)
+- `user-name`: Your Git user name. (required)
 - `paths`: (Optional) File path to sync (not directories).
 - `commit-message`: (Optional) Commit message.
 - `assignees`: (Optional) A comma or newline-separated list of assignees (GitHub usernames).
