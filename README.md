@@ -62,4 +62,4 @@ You can configure the following inputs based on your requirements:
 
 ## License
 
-This GitHub Action is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This GitHub Action is licensed under the Unlicense License. See the [LICENSE](LICENSE) file for details.
