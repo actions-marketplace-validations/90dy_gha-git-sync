@@ -1,6 +1,6 @@
-# Git Sync from 90dy
+# Git Sync Github Action
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/90dy/gha-git-sync/CI)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/90dy/gha-git-sync/semantic-release)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/90dy/gha-git-sync)
 
 This GitHub Action enables you to synchronize the latest changes from another repository, streamlining your development process.
@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Git Sync from 90dy
-        uses: 90dy/git-sync-from-90dy@v1
+        uses: 90dy/gha-git-sync@v1
         with:
           repository: '' # Repository to pull from
           branch: '' # Branch to sync
@@ -41,10 +41,10 @@ jobs:
 
 You can configure the following inputs based on your requirements:
 
-- `repository`: The repository to pull changes from. (required)
-- `branch`: The branch to sync. (required)
-- `user-email`: Your Git user email. (required)
-- `user-name`: Your Git user name. (required)
+- `repository`: The repository to pull changes from.
+- `branch`: The branch to sync.
+- `user-email`: Your Git user email.
+- `user-name`: Your Git user name.
 - `paths`: (Optional) File path to sync (not directories).
 - `commit-message`: (Optional) Commit message.
 - `assignees`: (Optional) A comma or newline-separated list of assignees (GitHub usernames).
