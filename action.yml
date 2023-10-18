@@ -75,3 +75,4 @@ runs:
       branch:  ${{ inputs.repository }}/${{ inputs.branch }}
       author: ${{ inputs.user-name }} <${{ inputs.user-email }}>
       committer: ${{ inputs.user-name }} <${{ inputs.user-email }}>
+      assignees: ${{ inputs.assignees }}
