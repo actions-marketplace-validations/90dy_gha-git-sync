@@ -23,13 +23,15 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          branch: main # Branch to sync in
 
-      - name: Git Sync from 90dy
+      - name: Git Sync
         uses: 90dy/gha-git-sync@v1
         with:
           repository: '' # Repository to pull from
-          branch: '' # Branch to sync
+          branch: '' # Branch to sync from
           user-email: '' # Git user email
           user-name: '' # Git user name
           paths: | # File path to sync (not directories)
