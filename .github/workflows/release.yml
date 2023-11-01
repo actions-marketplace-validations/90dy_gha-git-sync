@@ -23,7 +23,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           repository: 90dy/gha-git-sync
-          branch: ${{ github.ref_name }}
+          branch: main
           user-email: 90dy+bot@proton.me
           user-name: 90dy
 
