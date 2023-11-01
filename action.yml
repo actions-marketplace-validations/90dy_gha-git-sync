@@ -24,6 +24,12 @@ runs:
   using: composite
   steps:
   - shell: bash
+    id: get-branch-name
+    run: |
+      # Get current branch name
+      echo "branch-name=$(git rev-parse --abbrev-ref HEAD)" > $GITHUB_OUTPUT
+
+  - shell: bash
     run: |
       # Set commiter author
       git config --global user.email "${{ inputs.user-email }}"
@@ -43,14 +49,14 @@ runs:
     id: rebase
     run: |
       # Try to rebase and push on current branch
-      git rebase $(git rev-parse --abbrev-ref HEAD) -- $([ -z "${{ inputs.paths }}" ] || echo "${{ inputs.paths }}" | xargs echo)
+      git rebase ${{ steps.get-branch-name.outputs.branch-name }} -- $([ -z "${{ inputs.paths }}" ] || echo "${{ inputs.paths }}" | xargs echo)
 
   - shell: bash
     id: merge
     if: success() && steps.rebase.conclusion == 'success'
     run: |
       # Then merge to current branch
-      git checkout $(git rev-parse --abbrev-ref HEAD)
+      git checkout ${{ steps.get-branch-name.outputs.branch-name }}
       git merge ${{ inputs.repository }}/${{ inputs.branch }}
 
   - shell: bash
@@ -58,7 +64,7 @@ runs:
     if: success() && steps.merge.conclusion == 'success'
     run: |
       # Then push to  current branch if necessary
-      git push -u origin $(git rev-parse --abbrev-ref HEAD)
+      git push -u origin ${{ steps.get-branch-name.outputs.branch-name }}
 
   - shell: bash
     id: abort
