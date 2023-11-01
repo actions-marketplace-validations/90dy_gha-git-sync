@@ -1,6 +1,6 @@
 # Git Sync Github Action
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/90dy/gha-git-sync/semantic-release.yml)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/90dy/gha-git-sync/release.yml)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/90dy/gha-git-sync)
 
 This GitHub Action enables you to synchronize the latest changes from another repository, streamlining your development process.
