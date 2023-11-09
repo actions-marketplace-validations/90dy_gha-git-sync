@@ -19,6 +19,9 @@ inputs:
     description: Commit message
   assignees:
     description: A comma or newline-separated list of assignees (GitHub usernames).
+  remote:
+    description: The name of the remote to fetch from
+    default: origin
 
 runs:
   using: composite
@@ -42,8 +45,10 @@ runs:
 
   - shell: bash
     run: |
-      # Checkout new branch to sync/${{ inputs.branch }}
-      git checkout -b sync/${{ inputs.branch }}
+      # Checkout or create branch to sync/${{ inputs.branch }}
+      git fetch origin sync/${{ inputs.branch }} && \
+        git switch sync/${{ input.branch }} || \
+        git switch -b sync/${{ inputs.branch }}
 
   - shell: bash
     id: rebase
@@ -56,7 +61,7 @@ runs:
     if: success() && steps.rebase.conclusion == 'success'
     run: |
       # Then merge to current branch
-      git checkout ${{ steps.get-branch-name.outputs.branch-name }}
+      git switch ${{ steps.get-branch-name.outputs.branch-name }}
       git merge sync/${{ inputs.branch }}
 
   - shell: bash
