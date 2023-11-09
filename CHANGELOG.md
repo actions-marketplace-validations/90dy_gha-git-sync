@@ -1,3 +1,10 @@
+## [1.0.6](https://github.com/90dy/gha-git-sync/compare/v1.0.5...v1.0.6) (2023-11-09)
+
+
+### Bug Fixes
+
+* action ([a9e00aa](https://github.com/90dy/gha-git-sync/commit/a9e00aab36334daaa438218b826da2357166bec2))
+
 ## [1.0.5](https://github.com/90dy/gha-git-sync/compare/v1.0.4...v1.0.5) (2023-11-01)
 
 
