@@ -24,7 +24,7 @@ jobs:
         with:
           repository: 90dy/gha-git-sync
           branch: main
-          user-email: 90dy+bot@proton.me
+          user-email: forward+bot@90dy.ltd
           user-name: 90dy
 
   semantic-release:

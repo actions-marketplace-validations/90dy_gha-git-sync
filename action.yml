@@ -42,8 +42,8 @@ runs:
 
   - shell: bash
     run: |
-      # Checkout new branch to ${{ inputs.repository }}/${{ inputs.branch }}
-      git checkout -b ${{ inputs.repository }}/${{ inputs.branch }}
+      # Checkout new branch to sync/${{ inputs.branch }}
+      git checkout -b sync/${{ inputs.branch }}
 
   - shell: bash
     id: rebase
@@ -57,7 +57,7 @@ runs:
     run: |
       # Then merge to current branch
       git checkout ${{ steps.get-branch-name.outputs.branch-name }}
-      git merge ${{ inputs.repository }}/${{ inputs.branch }}
+      git merge sync/${{ inputs.branch }}
 
   - shell: bash
     id: push
@@ -70,15 +70,15 @@ runs:
     id: abort
     if: failure() && steps.rebase.conclusion == 'failure'
     run: |
-      # Else abort and create a pull request to ${{ inputs.repository }}/${{ inputs.branch }}
+      # Else abort and create a pull request to sync/${{ inputs.branch }}
       git rebase --abort
 
   - if: success() && steps.abort.conclusion == 'success'
     uses: peter-evans/create-pull-request@v5
     with:
       token: ${{ env.GITHUB_TOKEN }}
-      title: Sync from ${{ inputs.repository }}/${{ inputs.branch }}
-      branch:  ${{ inputs.repository }}/${{ inputs.branch }}
+      title: Sync from sync/${{ inputs.branch }}
+      branch:  sync/${{ inputs.branch }}
       author: ${{ inputs.user-name }} <${{ inputs.user-email }}>
       committer: ${{ inputs.user-name }} <${{ inputs.user-email }}>
       assignees: ${{ inputs.assignees }}
