@@ -19,10 +19,19 @@ inputs:
     description: Commit message
   assignees:
     description: A comma or newline-separated list of assignees (GitHub usernames).
+  remote:
+    description: The name of the remote to fetch from
+    default: origin
 
 runs:
   using: composite
   steps:
+  - shell: bash
+    id: get-branch-name
+    run: |
+      # Get current branch name
+      echo "branch-name=$(git rev-parse --abbrev-ref HEAD)" > $GITHUB_OUTPUT
+
   - shell: bash
     run: |
       # Set commiter author
@@ -36,43 +45,45 @@ runs:
 
   - shell: bash
     run: |
-      # Checkout new branch to ${{ inputs.repository }}/${{ inputs.branch }}
-      git checkout -b ${{ inputs.repository }}/${{ inputs.branch }}
+      # Checkout or create branch to sync/${{ inputs.branch }}
+      git fetch origin sync/${{ inputs.branch }} && \
+        git switch sync/${{ input.branch }} || \
+        git switch -b sync/${{ inputs.branch }}
 
   - shell: bash
     id: rebase
     run: |
-      # Try to rebase and push on ${{ github.ref_name }}
-      git rebase ${{ github.ref_name }} -- $([ -z "${{ inputs.paths }}" ] || echo "${{ inputs.paths }}" | xargs echo)
+      # Try to rebase and push on current branch
+      git rebase ${{ steps.get-branch-name.outputs.branch-name }} -- $([ -z "${{ inputs.paths }}" ] || echo "${{ inputs.paths }}" | xargs echo)
 
   - shell: bash
     id: merge
     if: success() && steps.rebase.conclusion == 'success'
     run: |
-      # Then merge to ${{ github.ref_name }}
-      git checkout ${{ github.ref_name }}
-      git merge ${{ inputs.repository }}/${{ inputs.branch }}
+      # Then merge to current branch
+      git switch ${{ steps.get-branch-name.outputs.branch-name }}
+      git merge sync/${{ inputs.branch }}
 
   - shell: bash
     id: push
     if: success() && steps.merge.conclusion == 'success'
     run: |
-      # Then push to ${{ github.ref_name }} if necessary
-      git push -u origin ${{ github.ref_name }}
+      # Then push to  current branch if necessary
+      git push -u origin ${{ steps.get-branch-name.outputs.branch-name }}
 
   - shell: bash
     id: abort
     if: failure() && steps.rebase.conclusion == 'failure'
     run: |
-      # Else abort
+      # Else abort and create a pull request to sync/${{ inputs.branch }}
       git rebase --abort
 
   - if: success() && steps.abort.conclusion == 'success'
     uses: peter-evans/create-pull-request@v5
     with:
       token: ${{ env.GITHUB_TOKEN }}
-      title: Sync from ${{ inputs.repository }}/${{ inputs.branch }}
-      branch:  ${{ inputs.repository }}/${{ inputs.branch }}
+      title: Sync from sync/${{ inputs.branch }}
+      branch:  sync/${{ inputs.branch }}
       author: ${{ inputs.user-name }} <${{ inputs.user-email }}>
       committer: ${{ inputs.user-name }} <${{ inputs.user-email }}>
       assignees: ${{ inputs.assignees }}

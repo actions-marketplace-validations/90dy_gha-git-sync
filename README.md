@@ -1,6 +1,6 @@
 # Git Sync Github Action
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/90dy/gha-git-sync/semantic-release.yml)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/90dy/gha-git-sync/release.yml)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/90dy/gha-git-sync)
 
 This GitHub Action enables you to synchronize the latest changes from another repository, streamlining your development process.
@@ -23,13 +23,15 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          branch: main # Branch to sync in
 
-      - name: Git Sync from 90dy
+      - name: Git Sync
         uses: 90dy/gha-git-sync@v1
         with:
           repository: '' # Repository to pull from
-          branch: '' # Branch to sync
+          branch: '' # Branch to sync from
           user-email: '' # Git user email
           user-name: '' # Git user name
           paths: | # File path to sync (not directories)
@@ -37,6 +39,7 @@ jobs:
             file-b.txt
           commit-message: '' # Commit message
           assignees: '' # A comma or newline-separated list of assignees (GitHub usernames)
+          remote: '' # The name of the remote to fetch from.
 ```
 
 You can configure the following inputs based on your requirements:
@@ -48,13 +51,14 @@ You can configure the following inputs based on your requirements:
 - `paths`: (Optional) File path to sync (not directories).
 - `commit-message`: (Optional) Commit message.
 - `assignees`: (Optional) A comma or newline-separated list of assignees (GitHub usernames).
+- `remote`: (Optional)` The name of the remote to fetch from.
 
 ## Workflow
 
 1. Set the committer information in the Git configuration.
 2. Fetch the changes from the specified repository and branch.
-3. Checkout a new branch named after the repository and branch you are syncing from.
-4. Attempt to rebase the changes and push them to the current branch.
+3. Checkout to a branch where to make change.
+4. Attempt to rebase the changes.
 5. If the rebase is successful, merge the changes into the current branch.
 6. If the merge is successful, push the changes to the current branch.
 7. If the rebase fails, abort the process.
